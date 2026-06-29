@@ -28,6 +28,10 @@ The binaries are self-contained — no Python install needed. Examples below ass
 chmod +x flo-linux-x86_64
 ./flo-linux-x86_64 start
 ```
+or if you are using `mise` add this to your `config.toml`
+```toml
+"github:mkhabelaj/flo-releases" = { version = "latest", bin = "flo" }
+```
 
 On macOS the binary is unsigned, so Gatekeeper blocks it on first launch. Clear the quarantine flag once:
 
