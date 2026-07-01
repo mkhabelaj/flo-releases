@@ -1,6 +1,6 @@
 # flo
 
-**Status:** beta (`0.1.0b1`) — usable, API may change before 1.0.
+**Status:** beta (`0.1.0b2`) — usable, API may change before 1.0.
 
 A Textual TUI for guided decision trees. Pick an option, advance to the next step, walk back through history.
 
@@ -14,9 +14,6 @@ Grab a binary from the [latest release](https://github.com/mkhabelaj/flo-release
 |----------|------|
 | Linux (x86_64) | `flo-linux-x86_64` |
 | macOS (Apple Silicon) | `flo-macos-arm64` |
-| Windows (x86_64) | `flo-windows-x86_64.exe` |
-
-> The Windows build is best-effort and may occasionally lag behind a release.
 
 ## Run it
 
@@ -40,12 +37,6 @@ xattr -d com.apple.quarantine ./flo-macos-arm64
 ```
 
 (or right-click the file → **Open** → confirm).
-
-**Windows:**
-
-```sh
-flo-windows-x86_64.exe start
-```
 
 The Linux binary is built against glibc 2.35 (Ubuntu 22.04), so it runs on Debian 12, Fedora, Arch, and most current distros. glibc is forward-compatible only.
 
