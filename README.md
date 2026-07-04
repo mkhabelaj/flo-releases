@@ -1,6 +1,6 @@
 # flo
 
-**Status:** beta (`0.1.0b2`) — usable, API may change before 1.0.
+**Status:** beta (`0.1.0b4`) — usable, API may change before 1.0.
 
 A Textual TUI for guided decision trees. Pick an option, advance to the next step, walk back through history.
 
@@ -45,7 +45,10 @@ The Linux binary is built against glibc 2.35 (Ubuntu 22.04), so it runs on Debia
 flo is a small command-line tool. The TUI does not start unless you ask for it:
 
 - `flo start` — launch the interactive TUI.
+- `flo run` — list every runnable leaf as `path<TAB>command`.
+- `flo run <path>` — run a leaf without the TUI, e.g. `flo run git/status`. Supply input/picker values with `--set key=value` (repeatable); `--dry-run` (`-n`) prints the resolved command instead. Exits with the command's exit code.
 - `flo config --view` — open the config builder in your browser (visual workflow editor).
+- `flo config --check` — validate the config and exit (`2` on error); also prints lint warnings for unknown `{placeholders}`, dead leaves, and unmatched `when:` keys.
 - `flo --version` — print the version.
 
 ## Controls
@@ -55,6 +58,9 @@ flo is a small command-line tool. The TUI does not start unless you ask for it:
 - `↑` / `↓` or `j` / `k` — move between options
 - `Enter` or double-click — select option / advance to next step
 - `Backspace` / `Esc` — return to previous step
+- `g` — jump back to the root step (clears captured values)
+- `r` — reload the config from disk (workflow screen)
+- `/` — jump: search every leaf command and go straight there (workflow screen)
 
 ### Running a command
 
@@ -66,11 +72,15 @@ Every command goes through a two-step flow:
    - `c` — capture (run with stdout/stderr shown in-app)
    - `d` — dry-run (show resolved command, don't execute)
    - `y` — copy command to clipboard
-   - `e` — edit the command before running interactively
+   - `e` — edit the command, then pick any of the modes above
+
+After a command finishes (or a dry-run/copy), flo returns to the step you picked it from — not the root — so nearby commands are one keypress away. Press `g` any time to go back to the root.
+
+While a captured command (or a `from_command` picker) is running, `Esc` cancels it — the shell process is killed and you return to the previous step.
 
 ### Screens
 
-- `Ctrl+W` — Workflow (main decision-tree screen)
+- `Ctrl+O` — Workflow (main decision-tree screen)
 - `Ctrl+R` — History (recent commands, most recent first)
 - `Ctrl+Y` — Rankings (most-used commands by frequency)
 - `Ctrl+S` — Settings (theme, history limit, clear history)
@@ -92,12 +102,16 @@ The Settings screen (`Ctrl+S`) has three sections:
 
 flo works out of the box — a default set of workflows ships inside the binary.
 
-To customise, flo reads `~/.config/flo/workflows.yaml` (or `$XDG_CONFIG_HOME/flo/workflows.yaml` if `XDG_CONFIG_HOME` is set). If that file doesn't exist, the bundled defaults are used.
+Configs load in this order:
+
+1. `.flo.yaml` in the current directory or any parent — per-project workflows. When both a project and a user config exist, the project's root options are shown first, followed by the user's.
+2. `~/.config/flo/workflows.yaml` (or `$XDG_CONFIG_HOME/flo/workflows.yaml` if set).
+3. The bundled defaults.
 
 Two ways to edit:
 
-1. **Visual editor (easiest):** run `flo config --view` to open the browser-based config builder.
-2. **By hand:** create `~/.config/flo/workflows.yaml` and write it using the schema below.
+1. **Visual editor (easiest):** run `flo config --view` to open the browser-based config builder. **Save to flo** writes straight to `~/.config/flo/workflows.yaml` (backing up the previous file to `workflows.yaml.bak`); **Download YAML** exports a copy instead.
+2. **By hand:** create `~/.config/flo/workflows.yaml` (or a project `.flo.yaml`) using the schema below.
 
 ```sh
 mkdir -p ~/.config/flo
@@ -118,7 +132,7 @@ Schema (each node is a mapping with a `type` field):
   - `next` — for `from_command` / `input` steps, the step or option that follows
 - **option** — a leaf choice
   - `name` *(required)* — the label shown
-  - `run` — shell command to execute. `{key}` substitution from captured values uses identifier-only braces, so docker template syntax (`{{.Names}}`) and tmux format strings (`#{window_name}`) pass through untouched.
+  - `run` — shell command to execute. `{key}` substitution from captured values uses identifier-only braces, so docker template syntax (`{{.Names}}`, `{{end}}`) and tmux format strings (`#{window_name}`) pass through untouched. Substituted values are shell-quoted automatically (a value with spaces stays one argument); use `{key|raw}` to opt out, e.g. to inject multiple flags.
   - `next` — the next step shown after selecting this option
   - `cwd: "/path"` — working directory for the run command (supports `{key}` substitution)
   - `env: {KEY: "value"}` — extra env vars merged over the current environment (values support `{key}`)
