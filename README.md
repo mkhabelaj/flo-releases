@@ -1,6 +1,6 @@
 # flo
 
-**Status:** `0.1.1` — config schema stable; breaking changes only with a 0.x minor bump.
+**Status:** `0.2.0` — config schema stable; breaking changes only with a 0.x minor bump.
 
 A Textual TUI for guided decision trees. Pick an option, advance to the next step, walk back through history.
 
@@ -68,7 +68,8 @@ Every command goes through a two-step flow:
 
 1. `Enter` — arms the preview and reveals execution-mode keys
 2. Pick how to run:
-   - `i` — interactive (suspend TUI, run in terminal)
+   - `i` — interactive (suspend TUI, run in terminal, return to flo)
+   - `x` — run & close (record to history, exit flo, run in the terminal — for k9s/ssh-style takeovers)
    - `c` — capture (run with stdout/stderr shown in-app)
    - `d` — dry-run (show resolved command, don't execute)
    - `y` — copy command to clipboard
