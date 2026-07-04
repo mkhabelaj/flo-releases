@@ -1,6 +1,6 @@
 # flo
 
-**Status:** beta (`0.1.0b4`) — usable, API may change before 1.0.
+**Status:** `0.1.0` — config schema stable; breaking changes only with a 0.x minor bump.
 
 A Textual TUI for guided decision trees. Pick an option, advance to the next step, walk back through history.
 
@@ -132,11 +132,11 @@ Schema (each node is a mapping with a `type` field):
   - `next` — for `from_command` / `input` steps, the step or option that follows
 - **option** — a leaf choice
   - `name` *(required)* — the label shown
-  - `run` — shell command to execute. `{key}` substitution from captured values uses identifier-only braces, so docker template syntax (`{{.Names}}`, `{{end}}`) and tmux format strings (`#{window_name}`) pass through untouched. Substituted values are shell-quoted automatically (a value with spaces stays one argument); use `{key|raw}` to opt out, e.g. to inject multiple flags.
+  - `run` — shell command to execute, or a **list of commands** run as a sequence (joined with `&&`, so it stops at the first failure). `{key}` substitution from captured values uses identifier-only braces, so docker template syntax (`{{.Names}}`, `{{end}}`) and tmux format strings (`#{window_name}`) pass through untouched. Substituted values are shell-quoted automatically (a value with spaces stays one argument); use `{key|raw}` to opt out, e.g. to inject multiple flags.
   - `next` — the next step shown after selecting this option
   - `cwd: "/path"` — working directory for the run command (supports `{key}` substitution)
   - `env: {KEY: "value"}` — extra env vars merged over the current environment (values support `{key}`)
-  - `when: "{key} == value"` — conditional visibility for options. The option only renders when the expression matches the current session values. Supports `==` and `!=` against captured keys.
+  - `when: "{key} == value"` — conditional visibility for options. The option only renders when the expression matches the current session values. Supports `==` and `!=` against captured keys, and multiple comparisons combined with `and` / `or` (standard precedence — `and` binds tighter), e.g. `when: "{env} == dev or {env} == staging"`.
 
 Non-zero exit codes from a `run` command surface as a red toast `exit N: <command>` after the TUI resumes.
 
