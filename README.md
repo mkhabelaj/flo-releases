@@ -1,6 +1,6 @@
 # flo
 
-**Status:** `0.1.0` — config schema stable; breaking changes only with a 0.x minor bump.
+**Status:** `0.1.1` — config schema stable; breaking changes only with a 0.x minor bump.
 
 A Textual TUI for guided decision trees. Pick an option, advance to the next step, walk back through history.
 
@@ -72,11 +72,14 @@ Every command goes through a two-step flow:
    - `c` — capture (run with stdout/stderr shown in-app)
    - `d` — dry-run (show resolved command, don't execute)
    - `y` — copy command to clipboard
-   - `e` — edit the command, then pick any of the modes above
+   - `e` — edit the command inline, then pick any of the modes above
+   - `E` — edit the command in `$EDITOR` (`$VISUAL` preferred), then pick any of the modes above
 
 After a command finishes (or a dry-run/copy), flo returns to the step you picked it from — not the root — so nearby commands are one keypress away. Press `g` any time to go back to the root.
 
-While a captured command (or a `from_command` picker) is running, `Esc` cancels it — the shell process is killed and you return to the previous step.
+While a captured command (or a `from_command` picker) is running, `Esc` cancels it — the shell process is killed and you return to the previous step. Captured commands read stdin from `/dev/null`: anything that prompts for input (auth helpers etc.) fails fast instead of hanging — run those interactively (`i`) instead.
+
+In the captured-output panel: `y` copies the output to the clipboard, `a` appends the run (command, exit code, output) to the scratch pad. In History/Rankings, `y` copies the highlighted command.
 
 ### Screens
 
@@ -87,6 +90,8 @@ While a captured command (or a `from_command` picker) is running, `Esc` cancels 
 
 ### Other
 
+- `Ctrl+T` (or `:` on the workflow screen) — ad-hoc run: type or paste any command, preview it, then run in any mode; runs are recorded to history
+- `Ctrl+E` — open a persistent scratch pad in `$EDITOR` (notes live in flo's data dir as `scratch.md`)
 - `Ctrl+F` — toggle inline filter on the current screen (Workflow, History, Rankings)
 - `Ctrl+P` — command palette (search commands and switch themes)
 
