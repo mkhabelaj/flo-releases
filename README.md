@@ -6,6 +6,8 @@ A Textual TUI for guided decision trees. Pick an option, advance to the next ste
 
 This repo is the **download channel** for flo — prebuilt, standalone binaries. No Python required.
 
+<img width="900" height="828" alt="output2" src="https://github.com/user-attachments/assets/6fe8b459-b193-43ff-8f3c-50d009acfc67" />
+
 ## Download
 
 Grab a binary from the [latest release](https://github.com/mkhabelaj/flo-releases/releases/latest):
