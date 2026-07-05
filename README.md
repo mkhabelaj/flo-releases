@@ -1,6 +1,6 @@
 # flo
 
-**Status:** `0.2.0` — config schema stable; breaking changes only with a 0.x minor bump.
+**Status:** `0.3.0` — config schema stable; breaking changes only with a 0.x minor bump.
 
 A Textual TUI for guided decision trees. Pick an option, advance to the next step, walk back through history.
 
@@ -58,9 +58,9 @@ flo is a small command-line tool. The TUI does not start unless you ask for it:
 - `↑` / `↓` or `j` / `k` — move between options
 - `Enter` or double-click — select option / advance to next step
 - `Backspace` / `Esc` — return to previous step
-- `g` — jump back to the root step (clears captured values)
-- `r` — reload the config from disk (workflow screen)
-- `/` — jump: search every leaf command and go straight there (workflow screen)
+- `Ctrl+G` — jump back to the root step (clears captured values)
+- `Ctrl+L` — reload the config from disk (workflow screen)
+- `Ctrl+U` — jump: search every leaf command and go straight there (workflow screen)
 
 ### Running a command
 
@@ -84,7 +84,7 @@ In the captured-output panel: `y` copies the output to the clipboard, `a` append
 
 ### Screens
 
-- `Ctrl+O` — Workflow (main decision-tree screen)
+- `Ctrl+W` — Workflow (main decision-tree screen)
 - `Ctrl+R` — History (recent commands, most recent first)
 - `Ctrl+Y` — Rankings (most-used commands by frequency)
 - `Ctrl+S` — Settings (theme, history limit, clear history)
@@ -95,6 +95,36 @@ In the captured-output panel: `y` copies the output to the clipboard, `a` append
 - `Ctrl+E` — open a persistent scratch pad in `$EDITOR` (notes live in flo's data dir as `scratch.md`)
 - `Ctrl+F` — toggle inline filter on the current screen (Workflow, History, Rankings)
 - `Ctrl+P` — command palette (search commands and switch themes)
+
+## Custom keybindings
+
+Remap flo's screen and navigation keys in `~/.config/flo/keys.toml` (respects `XDG_CONFIG_HOME`). Each entry is a binding id set to either a key string, or a table with `key` and/or `show` (footer visibility):
+
+```toml
+reload = "f5"                             # remap
+jump = { key = "ctrl+k", show = false }   # remap and hide from the footer
+notes = { show = false }                  # keep default key, hide from footer
+```
+
+| id | default | action |
+|----|---------|--------|
+| `settings` | `ctrl+s` | Settings screen |
+| `history` | `ctrl+r` | History screen |
+| `rankings` | `ctrl+y` | Rankings screen |
+| `workflow` | `ctrl+w` | Workflow screen |
+| `filter` | `ctrl+f` | toggle inline filter |
+| `notes` | `ctrl+e` | scratch pad in `$EDITOR` |
+| `adhoc` | `ctrl+t` | ad-hoc run box |
+| `palette` | `ctrl+p` | Textual command palette (key remap only, no `show`) |
+| `back` | `backspace` | previous step / cancel (all screens) |
+| `cancel` | `escape` | previous step / cancel (all screens) |
+| `back_alt` | `h` | vim-style back (hidden) |
+| `reload` | `ctrl+l` | reload config |
+| `jump` | `ctrl+u` | command palette |
+| `root` | `ctrl+g` | back to root step |
+| `adhoc_alt` | `:` | ad-hoc run, vim-style (hidden) |
+
+Avoid `ctrl+j`, `ctrl+m`, `ctrl+i`, `ctrl+h`, and `ctrl+[` — in the terminal protocol these are the same bytes as Enter/Tab/Backspace/Escape, so they get interpreted as those keys instead of your binding. App-level bindings take priority over focused text fields, so a remap works on every screen. Unknown ids or invalid values show a warning toast at startup and are ignored.
 
 ## Settings
 
