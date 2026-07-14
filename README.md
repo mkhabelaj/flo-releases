@@ -1,6 +1,6 @@
 # flo
 
-**Status:** `0.3.0` — config schema stable; breaking changes only with a 0.x minor bump.
+**Status:** `0.4.0` — config schema stable; breaking changes only with a 0.x minor bump.
 
 A Textual TUI for guided decision trees. Pick an option, advance to the next step, walk back through history.
 
@@ -73,6 +73,7 @@ Every command goes through a two-step flow:
    - `i` — interactive (suspend TUI, run in terminal, return to flo)
    - `x` — run & close (record to history, exit flo, run in the terminal — for k9s/ssh-style takeovers)
    - `c` — capture (run with stdout/stderr shown in-app)
+   - `w` — watch (only shown when the option sets `watch:`): re-runs the command on the interval and re-renders the output in place, like `watch(1)`. `Enter`/`Esc` stops it
    - `d` — dry-run (show resolved command, don't execute)
    - `y` — copy command to clipboard
    - `e` — edit the command inline, then pick any of the modes above
@@ -172,6 +173,7 @@ Schema (each node is a mapping with a `type` field):
   - `name` *(required)* — the label shown
   - `run` — shell command to execute, or a **list of commands** run as a sequence (joined with `&&`, so it stops at the first failure). `{key}` substitution from captured values uses identifier-only braces, so docker template syntax (`{{.Names}}`, `{{end}}`) and tmux format strings (`#{window_name}`) pass through untouched. Substituted values are shell-quoted automatically (a value with spaces stays one argument); use `{key|raw}` to opt out, e.g. to inject multiple flags.
   - `next` — the next step shown after selecting this option
+  - `watch: 2s` — makes the option runnable in **watch mode** (`w` in the preview): flo re-runs the command every interval and re-renders the captured output in place, like `watch(1)`. Accepts a number of seconds or a duration (`2`, `2s`, `500ms`, `1m`); intervals are floored at `0.2s`. Only meaningful with `run:`.
   - `cwd: "/path"` — working directory for the run command (supports `{key}` substitution)
   - `env: {KEY: "value"}` — extra env vars merged over the current environment (values support `{key}`)
   - `when: "{key} == value"` — conditional visibility for options. The option only renders when the expression matches the current session values. Supports `==` and `!=` against captured keys, and multiple comparisons combined with `and` / `or` (standard precedence — `and` binds tighter), e.g. `when: "{env} == dev or {env} == staging"`.
